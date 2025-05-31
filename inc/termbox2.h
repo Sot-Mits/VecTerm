@@ -3464,7 +3464,7 @@ static int wait_event(struct tb_event *event, int timeout) {
 
         if (resize_has_events) {
             int ignore = 0;
-            read(global.resize_pipefd[0], &ignore, sizeof(ignore));
+            (void)read(global.resize_pipefd[0], &ignore, sizeof(ignore));
             // TODO: Harden against errors encountered mid-resize
             if_err_return(rv, update_term_size());
             if_err_return(rv, resize_cellbufs());
@@ -3775,7 +3775,7 @@ static int resize_cellbufs(void) {
 
 static void handle_resize(int sig) {
     int errno_copy = errno;
-    write(global.resize_pipefd[1], &sig, sizeof(sig));
+    (void)write(global.resize_pipefd[1], &sig, sizeof(sig));
     errno = errno_copy;
 }
 

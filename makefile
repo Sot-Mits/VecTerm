@@ -12,27 +12,24 @@ SRCS          = $(wildcard $(SRC_DIR)/*.c)
 OBJS          = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/$(BUILD)/%.o,$(SRCS))
 DEPS          = $(wildcard $(INC_DIR)/*.h)
 
-#Compiler Flags - Need changing if using a different compiler
+#Compiler Flags
 COMMON_FLAGS  = -I$(INC_DIR) -Wall -Wextra -Wpedantic -fdiagnostics-color=always
 GENERIC_FLAGS = -O3 -flto
 NATIVE_FLAGS  = -O3 -flto -march=native
-DEBUG_FLAGS   = -march=native -Og -ggdb3 -fsanitize=address,undefined
+DEBUG_FLAGS   = -Og -ggdb3
 
 all: generic
 
-#Generic build (optimized)
+#Generic build
 generic: CFLAGS = $(COMMON_FLAGS) $(GENERIC_FLAGS)
-generic: BUILD = generic
 generic: setup $(BIN_DIR)/$(TARGET)-$(BUILD)
 
-#Native-tuned build
+#Native build
 native: CFLAGS = $(COMMON_FLAGS) $(NATIVE_FLAGS)
-native: BUILD = native
 native: setup $(BIN_DIR)/$(TARGET)-$(BUILD)
 
 #Debug build
 debug: CFLAGS = $(COMMON_FLAGS) $(DEBUG_FLAGS)
-debug: BUILD = debug
 debug: setup $(BIN_DIR)/$(TARGET)-$(BUILD)
 
 #Create directories
@@ -46,6 +43,7 @@ $(OBJ_DIR)/$(BUILD)/%.o: $(SRC_DIR)/%.c $(DEPS)
 #Main targets
 $(BIN_DIR)/$(TARGET)-$(BUILD): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
+	-mv $(BIN_DIR)/$(TARGET)-generic $(BIN_DIR)/$(TARGET)
 
 #Clean build artifacts
 clean:
@@ -63,4 +61,4 @@ help:
 	@echo "Binaries output to: $(BIN_DIR)"
 	@echo "Objects output to: $(OBJ_DIR)"
 
-.PHONY: generic native debug clean help setup
+.PHONY: generic native debug clean help
